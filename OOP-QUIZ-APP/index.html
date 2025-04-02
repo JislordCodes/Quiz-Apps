@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Question Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #quiz-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h2 {
+            font-size: 24px;
+        }
+        .options {
+            margin: 15px 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+        }
+        #submit-btn, #next-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #submit-btn:disabled, #next-btn:disabled {
+            background-color: grey;
+        }
+        #score {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <h2 id="question-title">Question goes here</h2>
+    <div class="options">
+        <input type="radio" name="option" id="option1" value="A">
+        <label for="option1" id="label1"></label><br>
+        
+        <input type="radio" name="option" id="option2" value="B">
+        <label for="option2" id="label2"></label><br>
+        
+        <input type="radio" name="option" id="option3" value="C">
+        <label for="option3" id="label3"></label><br>
+        
+        <input type="radio" name="option" id="option4" value="D">
+        <label for="option4" id="label4"></label><br>
+    </div>
+    <button id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+    <button id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+    <p id="feedback"></p>
+    <p id="score"></p>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "What is the key difference between Object-Oriented Programming (OOP) and Procedure-Oriented Programming (POP)?",
+            options: ["OOP divides programs into objects, while POP divides them into functions", "POP uses data hiding, while OOP does not", "OOP focuses on procedures, while POP focuses on data", "POP provides data security, while OOP does not"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which of the following is NOT a key concept of Object-Oriented Programming?",
+            options: ["Encapsulation", "Inheritance", "Compilation", "Polymorphism"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What does encapsulation mean in Object-Oriented Programming?",
+            options: ["The ability to take multiple forms", "Wrapping data and methods together as a single unit", "The process of inheriting properties from another class", "Handling exceptions during program execution"],
+            correctAnswer: "B"
+        },
+        {
+            question: "In C++, which of the following is a correct way to declare a class?",
+            options: ["class Example {}", "Example class {}", "declare class Example {}", "new class Example {}"],
+            correctAnswer: "A"
+        },
+        {
+            question: "What is the purpose of a destructor in C++?",
+            options: ["To allocate memory for objects", "To overload functions", "To free up memory when an object is no longer needed", "To create multiple constructors in a class"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What is polymorphism in the context of Object-Oriented Programming?",
+            options: ["The ability to hide data", "The process of wrapping data into a single unit", "The ability of a function or object to take on many forms", "The process of allocating memory for objects"],
+            correctAnswer: "C"
+        },
+        {
+            question: "Which operator is used for function overloading in C++?",
+            options: ["+", "*", "::", "()"],
+            correctAnswer: "D"
+        },
+        {
+            question: "What is the default access specifier for a class in C++ if none is specified?",
+            options: ["Public", "Private", "Protected", "Internal"],
+            correctAnswer: "B"
+        },
+        {
+            question: "In inheritance, which class is referred to as the derived class?",
+            options: ["The class that inherits properties from another class", "The class that passes properties to other classes", "The class that is declared private", "The class that uses a constructor"],
+            correctAnswer: "A"
+        },
+        {
+            question: "What does the `new` operator do in C++?",
+            options: ["It releases memory", "It creates a destructor", "It allocates memory for an object", "It initializes a constructor"],
+            correctAnswer: "C"
+        },
+        {
+            question: "Which of the following is a benefit of Object-Oriented Programming (OOP)?",
+            options: ["It focuses on top-down problem-solving", "It allows for procedural-based memory management", "It promotes code reusability and modularity", "It avoids the use of inheritance"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What keyword is used to define a derived class in C++?",
+            options: ["extends", "inherits", "super", ":"],
+            correctAnswer: "D"
+        },
+        {
+            question: "What is the purpose of a constructor in C++?",
+            options: ["To initialize objects when they are created", "To destroy objects when they go out of scope", "To define member functions", "To encapsulate data"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which of the following is NOT a type of inheritance in C++?",
+            options: ["Single inheritance", "Multilevel inheritance", "Multi-object inheritance", "Hierarchical inheritance"],
+            correctAnswer: "C"
+        },
+        {
+            question: "In C++, which of the following best describes function overloading?",
+            options: ["Using the same function name with different return types", "Using the same function name with different parameter lists", "Using the same function name with different access specifiers", "Using different function names with the same parameters"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What is the scope resolution operator in C++?",
+            options: ["::", ".", "->", "<<"],
+            correctAnswer: "A"
+        },
+        {
+            question: "In which case will a constructor be invoked in C++?",
+            options: ["When an object is destroyed", "When an object is copied", "When an object is created", "When an object goes out of scope"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What is dynamic memory allocation in C++?",
+            options: ["Allocating memory at compile time", "Allocating memory before the program starts", "Allocating memory at runtime using `new` and `delete`", "Allocating memory for global variables"],
+            correctAnswer: "C"
+        },
+        {
+            question: "Which of the following is an example of a unary operator in C++?",
+            options: ["+", "--", "&&", "/"],
+            correctAnswer: "B"
+        },
+        {
+            question: "How is a destructor declared in C++?",
+            options: ["By using the `delete` keyword", "By using the `destroy` keyword", "By using the `~` symbol before the class name", "By using the `&` symbol before the class name"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What is the default return type of the main function in C++?",
+            options: ["int", "void", "float", "double"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which access specifier allows access to class members from derived classes but not from unrelated classes?",
+            options: ["Private", "Public", "Protected", "Static"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What is the primary use of the `virtual` keyword in C++?",
+            options: ["To make a function polymorphic", "To declare a class", "To inherit properties from another class", "To declare constants"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which of the following is a correct statement about pointers in C++?",
+            options: ["A pointer holds the value of an integer", "A pointer holds the address of a variable", "A pointer holds a value of a floating-point number", "A pointer can store only constant values"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What does the `delete` operator do in C++?",
+            options: ["Allocates memory for an object", "Initializes a class", "Frees dynamically allocated memory", "Assigns values to member variables"],
+            correctAnswer: "C"
+        },
+        {
+            question: "What does `this` pointer in C++ refer to?",
+            options: ["The current class", "The current object", "The superclass", "The global scope"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What does the `friend` keyword do in C++?",
+            options: ["Grants access to the class only within itself", "Grants access to private and protected members to non-member functions", "Grants access to global variables", "Declares a function as a static member"],
+            correctAnswer: "B"
+        },
+        {
+            question: "Which of the following is an example of operator overloading in C++?",
+            options: ["Using `+` to add two integers", "Using `+` to concatenate two strings", "Using `++` to increment an integer", "Using `*` to multiply two floats"],
+            correctAnswer: "B"
+        },
+        {
+            question: "In C++, what does an abstract class contain?",
+            options: ["No functions at all", "At least one pure virtual function", "Only private members", "Only static members"],
+            correctAnswer: "B"
+        },
+        {
+            question: "How can you make a class in C++ non-instantiable?",
+            options: ["By defining the constructor as `private`", "By defining all member functions as `public`", "By defining the destructor as `public`", "By declaring a class with only static members"],
+            correctAnswer: "A"
+        },
+        {
+            question: "What is the correct syntax for defining a function template in C++?",
+            options: ["template <class T> T functionName(T arg)", "template T <class functionName>(T arg)", "T template <class functionName>(T arg)", "template <T class> functionName(T arg)"],
+            correctAnswer: "A"
+        },
+        {
+            question: "What is the size of a pointer in C++ on a 64-bit machine?",
+            options: ["4 bytes", "8 bytes", "2 bytes", "16 bytes"],
+            correctAnswer: "B"
+        },
+        {
+            question: "Which of the following is a characteristic of multiple inheritance?",
+            options: ["A derived class inherits from one base class", "A derived class inherits from more than one base class", "A base class inherits from another base class", "Multiple base classes inherit from each other"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What is the correct syntax for defining a destructor in C++?",
+            options: ["void ~ClassName()", "~ClassName()", "ClassName()", "destructor ClassName()"],
+            correctAnswer: "B"
+        },
+        {
+            question: "In C++, what does the `public` access specifier do?",
+            options: ["Allows only derived classes to access the members", "Allows access to class members from any part of the program", "Hides the members from all functions outside the class", "Allows access to members only within the same file"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What type of polymorphism is achieved using function overloading in C++?",
+            options: ["Compile-time polymorphism", "Runtime polymorphism", "Dynamic binding", "Static inheritance"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which of the following is a type of constructor that takes no parameters?",
+            options: ["Copy constructor", "Default constructor", "Virtual constructor", "Parameterized constructor"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What does the `throw` keyword do in C++ exception handling?",
+            options: ["Declares an exception", "Raises an exception", "Catches an exception", "Handles an exception"],
+            correctAnswer: "B"
+        },
+        {
+            question: "In multiple inheritance, if two base classes have a function with the same name, how can the derived class access them?",
+            options: ["By creating two separate instances", "By using the scope resolution operator", "By using a destructor", "By calling a virtual function"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What is the use of a `static` keyword in C++?",
+            options: ["It initializes variables with random values", "It creates unique instances of functions", "It keeps a single copy of a variable for all objects of the class", "It creates multiple instances of a variable for each object"],
+            correctAnswer: "C"
+        },
+        {
+            question: "Which of the following is an example of a built-in exception in C++?",
+            options: ["Divide-by-zero exception", "Logic error exception", "Syntax error exception", "Runtime exception"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which operator is overloaded to provide array access in C++?",
+            options: ["<<", "[]", "()", "->"],
+            correctAnswer: "B"
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question-title').innerText = q.question;
+        document.getElementById('label1').innerText = q.options[0];
+        document.getElementById('label2').innerText = q.options[1];
+        document.getElementById('label3').innerText = q.options[2];
+        document.getElementById('label4').innerText = q.options[3];
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('next-btn').disabled = true;
+        document.getElementById('feedback').innerText = '';
+        const options = document.getElementsByName('option');
+        for (let i = 0; i < options.length; i++) {
+            options[i].checked = false;
+        }
+    }
+
+    function submitAnswer() {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (!selectedOption) {
+            alert("Please select an answer");
+            return;
+        }
+
+        const answer = selectedOption.value;
+        if (answer === questions[currentQuestion].correctAnswer) {
+            document.getElementById('feedback').innerText = "Correct!";
+            score++;
+        } else {
+            document.getElementById('feedback').innerText = "Wrong! The correct answer was: " + questions[currentQuestion].correctAnswer;
+        }
+
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('next-btn').disabled = false;
+        document.getElementById('score').innerText = `Score: ${score}/${questions.length}`;
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion >= questions.length) {
+            document.getElementById('quiz-container').innerHTML = `<h2>Quiz Completed!</h2><p>Your final score is ${score}/${questions.length}</p>`;
+        } else {
+            loadQuestion();
+        }
+    }
+
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSC 226 by Jislord</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #quiz-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 30px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 17px;
+        }
+        h2 {
+            font-size: 24px;
+        }
+        .options {
+            margin: 15px 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+        }
+        #submit-btn, #next-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #submit-btn:disabled, #next-btn:disabled {
+            background-color: grey;
+        }
+        #score {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <h1>CSC 214 by Jislord</h1> <!-- Header included -->
+    <h2 id="question-title">Question goes here</h2>
+    <div class="options">
+        <input type="radio" name="option" id="option1" value="A">
+        <label for="option1" id="label1"></label><br>
+        
+        <input type="radio" name="option" id="option2" value="B">
+        <label for="option2" id="label2"></label><br>
+        
+        <input type="radio" name="option" id="option3" value="C">
+        <label for="option3" id="label3"></label><br>
+        
+        <input type="radio" name="option" id="option4" value="D">
+        <label for="option4" id="label4"></label><br>
+    </div>
+    <button id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+    <button id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+    <p id="feedback"></p>
+    <p id="score"></p>
+</div>
+
+<script>
+    const questions = [
+        {question: "Which of the following is a property of a transaction?", options: ["Atomicity", "Privacy", "Accessibility", "Concurrency"], correctAnswer: "A"},
+        {question: "What is the main purpose of normalization in a database?", options: ["Minimize redundancy", "Maximize redundancy", "Increase data retrieval time", "Reduce security"], correctAnswer: "A"},
+        {question: "Which of the following is NOT a DBMS?", options: ["MySQL", "Oracle", "Excel", "PostgreSQL"], correctAnswer: "C"},
+        {question: "The acronym ACID stands for Atomicity, Consistency, Isolation, and:", options: ["Distribution", "Durability", "Dependency", "Directivity"], correctAnswer: "B"},
+        {question: "A table in a relational database is also called a:", options: ["Tuple", "Relation", "Attribute", "Entity"], correctAnswer: "B"},
+        {question: "What is the role of a 'primary key' in a database?", options: ["To store duplicate data", "To uniquely identify records", "To act as a foreign key", "To update records"], correctAnswer: "B"},
+        {question: "In which file organization is data stored in a sequential manner?", options: ["Direct", "Hashing", "Sequential", "Indexed"], correctAnswer: "C"},
+        {question: "Which of the following is a part of SQL responsible for defining database structures?", options: ["DDL", "DML", "DCL", "TCL"], correctAnswer: "A"},
+        {question: "What does the 'rollback' command do in SQL?", options: ["Deletes data permanently", "Undoes changes made during a transaction", "Commits a transaction", "Grants privileges"], correctAnswer: "B"},
+        {question: "Which database model is based on a collection of tables?", options: ["Hierarchical", "Network", "Relational", "Object-oriented"], correctAnswer: "C"},
+        {question: "A view in SQL is:", options: ["A physical table", "A virtual table", "A database schema", "A stored procedure"], correctAnswer: "B"},
+        {question: "Which of the following commands is used to remove a table in SQL?", options: ["DROP", "DELETE", "TRUNCATE", "REMOVE"], correctAnswer: "A"},
+        {question: "What ensures that transactions are processed in a way that maintains the integrity of the database?", options: ["Consistency", "Data Security", "Data Mining", "Views"], correctAnswer: "A"},
+        {question: "Which SQL clause is used to eliminate duplicate records in a result set?", options: ["DISTINCT", "LIMIT", "HAVING", "UNIQUE"], correctAnswer: "A"},
+        {question: "Which file organization technique uses hashing to store records?", options: ["Index Sequential", "Direct File Organization", "Sequential", "B-Tree"], correctAnswer: "B"},
+        {question: "Which of the following refers to a rule on data used to control the allowed data in a column?", options: ["Index", "View", "Trigger", "Constraint"], correctAnswer: "D"},
+        {question: "What is the result of a cross join in SQL?", options: ["Cartesian product", "Inner join", "Left join", "Natural join"], correctAnswer: "A"},
+        {question: "What is a tuple in a relational database?", options: ["A row", "A column", "A table", "A schema"], correctAnswer: "A"},
+        {question: "In which concurrency control technique are timestamps assigned to transactions?", options: ["Locking Protocol", "Time Stamp Ordering", "Multiversion Technique", "Deadlock Prevention"], correctAnswer: "B"},
+        {question: "What SQL clause is used to filter groups of rows?", options: ["WHERE", "HAVING", "GROUP BY", "DISTINCT"], correctAnswer: "B"},
+        {question: "Which of the following is not a type of database failure?", options: ["System Crash", "Disk Failure", "Data Integrity", "Transaction Abort"], correctAnswer: "C"},
+        {question: "Which of the following is not a storage type in a database?", options: ["Volatile", "Non-volatile", "Stable", "Durable"], correctAnswer: "D"},
+        {question: "A foreign key is used to:", options: ["Ensure uniqueness within the same table", "Enforce referential integrity between two tables", "Update rows", "Restrict access to data"], correctAnswer: "B"},
+        {question: "Which operation is not part of the DML commands?", options: ["SELECT", "INSERT", "DELETE", "CREATE"], correctAnswer: "D"},
+        {question: "What does SQL stand for?", options: ["Structured Query Language", "Simple Query Language", "Secure Query Language", "Standard Query Language"], correctAnswer: "A"},
+        {question: "In which normal form is a relation if it is free from partial dependencies?", options: ["1NF", "2NF", "3NF", "BCNF"], correctAnswer: "B"},
+        {question: "The process of assigning privileges to users is known as:", options: ["Granting", "Revoking", "Authentication", "Authorization"], correctAnswer: "A"},
+        {question: "Which of the following ensures that data is not lost even after a system crash?", options: ["Isolation", "Durability", "Atomicity", "Consistency"], correctAnswer: "B"},
+        {question: "Which SQL command is used to modify the structure of an existing table?", options: ["ALTER", "MODIFY", "UPDATE", "DELETE"], correctAnswer: "A"},
+        {question: "Which of the following is a function of the recovery mechanism in a DBMS?", options: ["Ensure data integrity", "Handle deadlocks", "Manage transactions", "Recover from system failure"], correctAnswer: "D"},
+        {question: "Which of the following represents a set of operations in a transaction?", options: ["SELECT", "Batch Processing", "Transaction Control", "Schedule"], correctAnswer: "D"},
+        {question: "Which of the following methods is used to avoid deadlocks?", options: ["Time Stamping", "Log Files", "Locking", "Backup"], correctAnswer: "A"},
+        {question: "What ensures that database changes are permanent even in case of a system failure?", options: ["Isolation", "Durability", "Atomicity", "Consistency"],
+            correctAnswer: "B"
+        },
+        {
+            question: "What is the function of the commit command in SQL?",
+            options: ["Undo the last transaction", "Make database changes permanent", "Rollback a transaction", "Lock the database"],
+            correctAnswer: "B"
+        },
+        {
+            question: "Which of the following concepts is used to manage transactions in databases?",
+            options: ["Data independence", "Transaction control", "Normalization", "File organization"],
+            correctAnswer: "B"
+        },
+        {
+            question: "Which type of join includes records from the right table that have no matching records in the left table?",
+            options: ["Inner Join", "Left Join", "Right Join", "Full Outer Join"],
+            correctAnswer: "C"
+        },
+        {
+            question: "Which of the following is NOT a valid aggregate function in SQL?",
+            options: ["SUM", "AVG", "MAX", "TOTAL"],
+            correctAnswer: "D"
+        },
+        {
+            question: "Which of the following prevents unauthorized access to databases?",
+            options: ["Encryption", "Normalization", "SQL queries", "Data replication"],
+            correctAnswer: "A"
+        },
+        {
+            question: "Which keyword is used to sort the result-set in SQL?",
+            options: ["ORDER", "GROUP", "SORT", "ORDER BY"],
+            correctAnswer: "D"
+        },
+        {
+            question: "What is the purpose of the GROUP BY clause in SQL?", options: ["To combine rows that have the same values", "To sort the result set", "To join tables", "To create sub-queries"], correctAnswer: "A"},
+        {question: "Which of the following is used to define a collection of related data elements in DBMS?", options: ["Record", "Tuple", "Field", "Table"], correctAnswer: "D"},
+        {question: "Which SQL statement is used to extract data from a database?", options: ["DELETE", "EXTRACT", "GET", "SELECT"], correctAnswer: "D"},
+        {question: "Which of the following refers to the smallest unit of data that can be accessed or stored?", options: ["Bit", "Byte", "Field", "Record"], correctAnswer: "C"},
+        {question: "Which of the following ensures the accuracy and consistency of data over its lifecycle?", options: ["Concurrency", "Integrity", "Authorization", "Isolation"], correctAnswer: "B"},
+        {question: "What is the purpose of the UNIQUE constraint in SQL?", options: ["To allow only unique values in a column", "To limit the number of records in a table", "To combine records with the same values", "To define a primary key"], correctAnswer: "A"},
+        {question: "Which of the following file organization methods provides the fastest access to a record?", options: ["Sequential", "Hashing", "Indexed", "Direct"], correctAnswer: "B"},
+        {question: "Which of the following normal forms eliminates all transitive dependencies?", options: ["1NF", "2NF", "3NF", "BCNF"], correctAnswer: "C"},
+        {question: "What is a superkey in relational databases?", options: ["A minimal unique identifier", "A set of attributes that uniquely identify a row", "A foreign key", "An attribute used for indexing"], correctAnswer: "B"},
+        {question: "In DBMS, which of the following is a physical unit of data storage?", options: ["Block", "Tuple", "Field", "Key"], correctAnswer: "A"},
+        {question: "What does the ALTER command in SQL do?", options: ["Deletes a table", "Modifies the structure of an existing table", "Renames a table", "Retrieves data from a table"], correctAnswer: "B"}
+    ];
+let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question-title').innerText = q.question;
+        document.getElementById('label1').innerText = q.options[0];
+        document.getElementById('label2').innerText = q.options[1];
+        document.getElementById('label3').innerText = q.options[2];
+        document.getElementById('label4').innerText = q.options[3];
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('next-btn').disabled = true;
+        document.getElementById('feedback').innerText = '';
+        const options = document.getElementsByName('option');
+        for (let i = 0; i < options.length; i++) {
+            options[i].checked = false;
+        }
+    }
+
+    function submitAnswer() {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (!selectedOption) {
+            alert("Please select an answer");
+            return;
+        }
+
+        const answer = selectedOption.value;
+        if (answer === questions[currentQuestion].correctAnswer) {
+            document.getElementById('feedback').innerText = "Correct!";
+            score++;
+        } else {
+            document.getElementById('feedback').innerText = "Wrong! The correct answer was: " + questions[currentQuestion].correctAnswer;
+        }
+
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('next-btn').disabled = false;
+        document.getElementById('score').innerText = `Score: ${score}/${questions.length}`;
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion >= questions.length) {
+            document.getElementById('quiz-container').innerHTML = `<h2>Quiz Completed!</h2><p>Your final score is ${score}/${questions.length}</p>`;
+        } else {
+            loadQuestion();
+        }
+    }
+
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
