@@ -69,55 +69,31 @@
     archNodes.forEach((n) => n.classList.add("lit"));
   }
 
-  /* ---------------------------------- Demo log sequencer ---------------------------------- */
-  const demoLogItems = document.querySelectorAll("#demoLog li");
-  const demoSection = document.getElementById("how-it-works");
-  let demoStarted = false;
-  let demoBuildStep = 0;
-  const demoBuildTarget = { step: 0 };
-
-  function runDemoSequence() {
-    if (demoStarted) return;
-    demoStarted = true;
-    let i = 0;
-    const total = demoLogItems.length;
-    const tick = () => {
-      demoLogItems.forEach((li, idx) => {
-        li.classList.toggle("active", idx === i);
-        li.classList.toggle("done", idx < i);
-      });
-      demoBuildTarget.step = i;
-      i++;
-      if (i <= total) {
-        setTimeout(tick, 950);
-      } else {
-        // loop the whole sequence softly after a pause
-        setTimeout(() => {
-          demoLogItems.forEach((li) => li.classList.remove("active", "done"));
-          i = 0;
-          demoBuildTarget.step = 0;
-          tick();
-        }, 2600);
-      }
-    };
-    tick();
-  }
-
-  if (demoSection && "IntersectionObserver" in window) {
-    const demoIO = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) runDemoSequence();
-        });
-      },
-      { threshold: 0.4 }
-    );
-    demoIO.observe(demoSection);
-  } else {
-    runDemoSequence();
-  }
-
   /* ---------------------------------- Waitlist modal ---------------------------------- */
+  // "Request Early Access" and "Become a Design Partner" open the same dialog
+  // shell but are distinct asks — different copy, a company field for design
+  // partners, and a "type" recorded with the submission.
+  const MODAL_COPY = {
+    "early-access": {
+      kicker: "Early Access",
+      title: "Join the waitlist",
+      sub: "Tell us a bit about you. This helps us shape the first workflows around real design work.",
+      submit: "Join the waitlist",
+      successTitle: "You&rsquo;re on the list.",
+      successText: "Thanks for your interest in InfraStudio. We&rsquo;ll be in touch as early access opens.",
+      showCompany: false,
+    },
+    "design-partner": {
+      kicker: "Design Partner",
+      title: "Become a design partner",
+      sub: "Design partners get closer collaboration: shaping the roadmap, piloting new workflows first, and direct access to our team.",
+      submit: "Apply as a design partner",
+      successTitle: "Thanks for stepping up.",
+      successText: "We&rsquo;ll reach out to set up a conversation about becoming a design partner.",
+      showCompany: true,
+    },
+  };
+
   const overlay = document.getElementById("waitlistOverlay");
   const openTriggers = document.querySelectorAll("[data-open-waitlist]");
   const closeBtn = document.getElementById("modalClose");
@@ -125,8 +101,31 @@
   const formWrap = document.getElementById("modalForm");
   const successWrap = document.getElementById("modalSuccess");
   const form = document.getElementById("waitlistForm");
+  const modalKicker = document.getElementById("modalKicker");
+  const modalTitle = document.getElementById("waitlistTitle");
+  const modalSub = document.getElementById("modalSub");
+  const submitLabel = document.getElementById("submitLabel");
+  const successTitle = document.getElementById("successTitle");
+  const successText = document.getElementById("successText");
+  const companyField = document.getElementById("companyField");
+  const waitlistType = document.getElementById("waitlistType");
 
-  function openModal() {
+  function applyModalCopy(type) {
+    const copy = MODAL_COPY[type] || MODAL_COPY["early-access"];
+    waitlistType.value = type in MODAL_COPY ? type : "early-access";
+    modalKicker.textContent = copy.kicker;
+    modalTitle.textContent = copy.title;
+    modalSub.textContent = copy.sub;
+    submitLabel.textContent = copy.submit;
+    successTitle.innerHTML = copy.successTitle;
+    successText.innerHTML = copy.successText;
+    companyField.hidden = !copy.showCompany;
+    const companyInput = companyField.querySelector("input");
+    if (companyInput) companyInput.required = copy.showCompany;
+  }
+
+  function openModal(type) {
+    applyModalCopy(type);
     overlay.classList.add("open");
     document.body.style.overflow = "hidden";
     formWrap.hidden = false;
@@ -139,7 +138,9 @@
     document.body.style.overflow = "";
   }
 
-  openTriggers.forEach((btn) => btn.addEventListener("click", openModal));
+  openTriggers.forEach((btn) =>
+    btn.addEventListener("click", () => openModal(btn.dataset.openWaitlist))
+  );
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (doneBtn) doneBtn.addEventListener("click", closeModal);
   if (overlay) {
@@ -156,9 +157,11 @@
       e.preventDefault();
       const data = new FormData(form);
       const entry = {
+        type: (data.get("type") || "early-access").toString(),
         name: (data.get("name") || "").toString().trim(),
         email: (data.get("email") || "").toString().trim(),
         profession: (data.get("profession") || "").toString().trim(),
+        company: (data.get("company") || "").toString().trim(),
         notes: (data.get("notes") || "").toString().trim(),
         submittedAt: new Date().toISOString(),
       };
@@ -170,20 +173,37 @@
       });
       if (!valid) return;
 
-      // Persist locally (no backend wired up yet — this is a static prototype form).
-      try {
-        const key = "infrastudio_waitlist";
-        const existing = JSON.parse(localStorage.getItem(key) || "[]");
-        existing.push(entry);
-        localStorage.setItem(key, JSON.stringify(existing));
-      } catch (err) {
-        /* localStorage unavailable — fail silently, still show success */
-      }
+      const showSuccess = () => {
+        formWrap.hidden = true;
+        successWrap.hidden = false;
+        form.reset();
+        form.querySelectorAll(".touched").forEach((el) => el.classList.remove("touched"));
+      };
 
-      formWrap.hidden = true;
-      successWrap.hidden = false;
-      form.reset();
-      form.querySelectorAll(".touched").forEach((el) => el.classList.remove("touched"));
+      // Primary path: append the submission to data/waitlist.csv via the small
+      // local Node server (see server.js) — this is the stopgap before a real
+      // backend exists. Falls back to localStorage if that server isn't running
+      // (e.g. the page was opened from a plain static file host).
+      fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("waitlist endpoint responded with " + res.status);
+          showSuccess();
+        })
+        .catch(() => {
+          try {
+            const key = "infrastudio_waitlist";
+            const existing = JSON.parse(localStorage.getItem(key) || "[]");
+            existing.push(entry);
+            localStorage.setItem(key, JSON.stringify(existing));
+          } catch (err) {
+            /* localStorage unavailable — fail silently, still show success */
+          }
+          showSuccess();
+        });
     });
   }
 
@@ -314,66 +334,6 @@
     }
   }
 
-  function initDemoScene(THREE) {
-    const canvas = document.getElementById("demoCanvas");
-    if (!canvas) return;
-    const frame = canvas.parentElement;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-    camera.position.set(3.6, 2.6, 4.4);
-    camera.lookAt(0, 0.7, 0);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    const group = new THREE.Group();
-    buildWireframeHouse(THREE, group, { dark: false });
-    group.position.y = -0.9;
-    scene.add(group);
-
-    // Track children so we can progressively reveal them in step with the log
-    const parts = group.children.slice();
-    parts.forEach((p) => (p.visible = false));
-
-    function applyStepVisibility(step) {
-      // Roughly map 6 log steps -> progressive reveal of the ~part count
-      const total = parts.length;
-      const ratio = Math.min((step + 1) / 6, 1);
-      const visibleCount = Math.ceil(total * ratio);
-      parts.forEach((p, idx) => (p.visible = idx < visibleCount));
-    }
-
-    function resize() {
-      const w = frame.clientWidth;
-      const h = frame.clientHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / Math.max(h, 10);
-      camera.updateProjectionMatrix();
-    }
-    resize();
-    window.addEventListener("resize", resize);
-
-    let raf;
-    function animate(t) {
-      raf = requestAnimationFrame(animate);
-      if (!prefersReducedMotion) group.rotation.y = t * 0.00018;
-      applyStepVisibility(demoBuildTarget.step);
-      renderer.render(scene, camera);
-    }
-    raf = requestAnimationFrame(animate);
-
-    if ("IntersectionObserver" in window) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) cancelAnimationFrame(raf);
-          else if (!raf) raf = requestAnimationFrame(animate);
-        });
-      });
-      io.observe(canvas);
-    }
-  }
-
   function loadThree(cb) {
     if (window.THREE) return cb(window.THREE);
     const script = document.createElement("script");
@@ -393,7 +353,6 @@
     loadThree((THREE) => {
       if (!THREE) return;
       initHeroScene(THREE);
-      initDemoScene(THREE);
     });
   }
 })();

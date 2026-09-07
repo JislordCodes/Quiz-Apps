@@ -40,13 +40,12 @@
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#product">Product</a>
-      <a href="#how-it-works">How it works</a>
       <a href="#technology">Technology</a>
       <a href="#vision">Vision</a>
       <a href="#about">About</a>
     </nav>
     <div class="nav-cta">
-      <button class="btn btn-ghost" data-open-waitlist>Request Early Access</button>
+      <button class="btn btn-ghost" data-open-waitlist="early-access">Request Early Access</button>
       <a class="btn btn-primary" href="https://infra-studio-z3xc.vercel.app" target="_blank" rel="noopener">Try Now</a>
     </div>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
@@ -55,11 +54,10 @@
   </div>
   <div class="nav-mobile" id="navMobile">
     <a href="#product">Product</a>
-    <a href="#how-it-works">How it works</a>
     <a href="#technology">Technology</a>
     <a href="#vision">Vision</a>
     <a href="#about">About</a>
-    <button class="btn btn-ghost" data-open-waitlist>Request Early Access</button>
+    <button class="btn btn-ghost" data-open-waitlist="early-access">Request Early Access</button>
     <a class="btn btn-primary" href="https://infra-studio-z3xc.vercel.app" target="_blank" rel="noopener">Try Now</a>
   </div>
 </header>
@@ -75,8 +73,8 @@
       <h1>Design the built world with AI.</h1>
       <p class="hero-sub">InfraStudio turns natural-language design intent into computable, editable, and validated BIM models&mdash;giving AI a structured environment to reason about and work with buildings.</p>
       <div class="hero-actions">
-        <button class="btn btn-primary btn-lg" data-open-waitlist>Request Early Access</button>
-        <a class="btn btn-outline btn-lg" href="#how-it-works">See How It Works <span class="arrow">&darr;</span></a>
+        <button class="btn btn-primary btn-lg" data-open-waitlist="early-access">Request Early Access</button>
+        <a class="btn btn-outline btn-lg" href="#product">See the Workflow <span class="arrow">&darr;</span></a>
       </div>
       <div class="hero-meta">
         <a href="https://infra-studio-z3xc.vercel.app" target="_blank" rel="noopener">Try the live prototype &rarr;</a>
@@ -210,50 +208,6 @@
         <h3>Iterate</h3>
         <p>Where validation fails, the system revises the model and re-checks it.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== HOW IT WORKS / DEMO ===================== -->
-<section class="section" id="how-it-works">
-  <div class="section-inner">
-    <p class="kicker">How It Works</p>
-    <h2 class="section-title">Watch design intent become a model.</h2>
-    <p class="section-sub">This is engineering software, not a chatbot. Every step operates on a real, structured representation of the building.</p>
-
-    <div class="demo reveal">
-      <div class="demo-col demo-prompt">
-        <span class="demo-label">Natural language</span>
-        <div class="demo-card">
-          <p>&ldquo;Create a two-story residential building with four bedrooms, an open-plan kitchen and living area, and large south-facing windows.&rdquo;</p>
-        </div>
-      </div>
-
-      <div class="demo-col demo-activity">
-        <span class="demo-label">AI activity</span>
-        <ul class="demo-log" id="demoLog">
-          <li data-step="0">Interpreting requirements</li>
-          <li data-step="1">Planning spaces</li>
-          <li data-step="2">Creating walls</li>
-          <li data-step="3">Generating openings</li>
-          <li data-step="4">Establishing relationships</li>
-          <li data-step="5">Validating geometry</li>
-        </ul>
-      </div>
-
-      <div class="demo-col demo-model">
-        <span class="demo-label">Structured BIM model</span>
-        <div class="demo-card demo-3d">
-          <canvas id="demoCanvas" aria-label="BIM model assembling from prompt"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="demo-results reveal">
-      <span class="result-chip">&check; IFC model generated</span>
-      <span class="result-chip">&check; Geometry validated</span>
-      <span class="result-chip">&check; Editable</span>
-      <span class="result-chip">&check; Interoperable</span>
     </div>
   </div>
 </section>
@@ -460,7 +414,7 @@
     <p class="kicker">Where We Are</p>
     <h2 class="section-title">We&rsquo;re building it now.</h2>
     <p class="section-sub">InfraStudio is currently in working-prototype stage. We&rsquo;ve demonstrated the core workflow from natural-language architectural intent to structured IFC/BIM models, and are now working with users to identify the highest-value workflow for our first customers.</p>
-    <button class="btn btn-primary btn-lg" data-open-waitlist>Become an Early Design Partner</button>
+    <button class="btn btn-primary btn-lg" data-open-waitlist="design-partner">Become an Early Design Partner</button>
   </div>
 </section>
 
@@ -493,8 +447,8 @@
     <h2 class="section-title">The next interface for the built world starts here.</h2>
     <p class="section-sub">We&rsquo;re looking for architects, engineers, BIM teams, and forward-thinking AEC companies to help shape the first workflows.</p>
     <div class="hero-actions center">
-      <button class="btn btn-primary btn-lg" data-open-waitlist>Request Early Access</button>
-      <button class="btn btn-outline btn-lg" data-open-waitlist data-partner>Become a Design Partner</button>
+      <button class="btn btn-primary btn-lg" data-open-waitlist="early-access">Request Early Access</button>
+      <button class="btn btn-outline btn-lg" data-open-waitlist="design-partner">Become a Design Partner</button>
     </div>
   </div>
 </section>
@@ -538,11 +492,12 @@
     <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
 
     <div class="modal-body" id="modalForm">
-      <p class="kicker">Early Access</p>
+      <p class="kicker" id="modalKicker">Early Access</p>
       <h3 id="waitlistTitle">Join the waitlist</h3>
-      <p class="modal-sub">Tell us a bit about you. This helps us shape the first workflows around real design work.</p>
+      <p class="modal-sub" id="modalSub">Tell us a bit about you. This helps us shape the first workflows around real design work.</p>
 
       <form id="waitlistForm" novalidate>
+        <input type="hidden" name="type" id="waitlistType" value="early-access" />
         <label>
           <span>Name</span>
           <input type="text" name="name" required autocomplete="name" placeholder="Ada Lovelace" />
@@ -555,19 +510,23 @@
           <span>Profession</span>
           <input type="text" name="profession" required placeholder="Architect, BIM Manager, Engineer&hellip;" />
         </label>
+        <label id="companyField" hidden>
+          <span>Studio / Company</span>
+          <input type="text" name="company" placeholder="Studio or firm name" />
+        </label>
         <label>
-          <span>What would you want InfraStudio to automate? <em>(optional)</em></span>
+          <span id="notesLabel">What would you want InfraStudio to automate? <em>(optional)</em></span>
           <textarea name="notes" rows="2" placeholder="Optional"></textarea>
         </label>
-        <button type="submit" class="btn btn-primary btn-lg btn-block">Join the waitlist</button>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitLabel">Join the waitlist</button>
         <p class="form-note">No spam. We&rsquo;ll reach out about early access and design-partner conversations.</p>
       </form>
     </div>
 
     <div class="modal-success" id="modalSuccess" hidden>
       <div class="success-icon">&check;</div>
-      <h3>You&rsquo;re on the list.</h3>
-      <p>Thanks for your interest in InfraStudio. We&rsquo;ll be in touch as early access opens.</p>
+      <h3 id="successTitle">You&rsquo;re on the list.</h3>
+      <p id="successText">Thanks for your interest in InfraStudio. We&rsquo;ll be in touch as early access opens.</p>
       <button class="btn btn-outline" id="modalDone">Done</button>
     </div>
   </div>
