@@ -15,7 +15,6 @@ without it). Fonts are Inter + JetBrains Mono via Google Fonts.
 Recommended — the bundled dev server also handles waitlist submissions:
 
 ```bash
-cd InfraStudio
 node server.js         # or: npm start
 # then open http://localhost:3000
 ```
@@ -26,7 +25,6 @@ Any static file server also works for browsing the site itself (e.g.
 ## Structure
 
 ```
-InfraStudio/
 ├── index.html          # full page markup (all sections)
 ├── css/style.css        # design system + layout + components
 ├── js/main.js            # nav, scroll reveals, waitlist modal, 3D hero scene
