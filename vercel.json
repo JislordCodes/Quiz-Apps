@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/InfraStudio/index.html" },
+    { "source": "/:path*", "destination": "/InfraStudio/:path*" }
+  ]
+}
