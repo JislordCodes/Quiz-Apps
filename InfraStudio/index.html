@@ -523,6 +523,17 @@
           <input type="text" name="company" placeholder="Studio or firm name" />
         </label>
         <label>
+          <span>What would you expect to pay for a product like this? <em>(optional)</em></span>
+          <select name="budget">
+            <option value="">Prefer not to say</option>
+            <option value="under-10">Under $10/mo</option>
+            <option value="10-50">$10&ndash;$50/mo &mdash; solo</option>
+            <option value="50-150">$50&ndash;$150/mo &mdash; small team</option>
+            <option value="150-plus">$150+/mo &mdash; firm-wide</option>
+            <option value="not-sure">Not sure yet</option>
+          </select>
+        </label>
+        <label>
           <span id="notesLabel">What would you want InfraStudio to automate? <em>(optional)</em></span>
           <textarea name="notes" rows="2" placeholder="Optional"></textarea>
         </label>

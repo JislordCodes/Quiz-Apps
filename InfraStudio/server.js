@@ -24,7 +24,7 @@ const DATA_DIR = path.join(ROOT, "data");
 const CSV_PATH = path.join(DATA_DIR, "waitlist.csv");
 const PORT = process.env.PORT || 3000;
 
-const CSV_COLUMNS = ["submittedAt", "type", "name", "email", "profession", "company", "notes"];
+const CSV_COLUMNS = ["submittedAt", "type", "name", "email", "profession", "company", "budget", "notes"];
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -94,6 +94,7 @@ function handleWaitlistSubmission(req, res) {
       email,
       profession,
       company: String(payload.company || "").trim(),
+      budget: String(payload.budget || "").trim(),
       notes: String(payload.notes || "").trim(),
     };
 
