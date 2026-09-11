@@ -162,6 +162,7 @@
         email: (data.get("email") || "").toString().trim(),
         profession: (data.get("profession") || "").toString().trim(),
         company: (data.get("company") || "").toString().trim(),
+        budget: (data.get("budget") || "").toString().trim(),
         notes: (data.get("notes") || "").toString().trim(),
         submittedAt: new Date().toISOString(),
       };
