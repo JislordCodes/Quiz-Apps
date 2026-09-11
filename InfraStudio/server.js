@@ -33,6 +33,7 @@ const MIME_TYPES = {
   ".svg": "image/svg+xml",
   ".json": "application/json; charset=utf-8",
   ".ico": "image/x-icon",
+  ".png": "image/png",
 };
 
 function csvEscape(value) {
